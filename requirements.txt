@@ -1,0 +1,14 @@
+click
+Sphinx
+coverage
+awscli
+flake8
+
+
+pytest # unit and integration testing
+flake8
+tox  # 
+black
+mypy 
+
+-e .

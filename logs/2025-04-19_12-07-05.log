@@ -1,0 +1,63 @@
+[2025-04-19 12:07:18,787]   12  root - INFO  Training Pipeline::::::::
+[2025-04-19 12:07:18,788]   13  root - INFO  Data ingestion is started::::::
+[2025-04-19 12:07:18,789]   27  root - INFO  data ingestion started:
+[2025-04-19 12:07:24,412]   34  root - INFO  reading data from dataframe
+[2025-04-19 12:07:28,088]   42  root - INFO  i am performing train test split
+[2025-04-19 12:07:28,224]   45  root - INFO  saving train and test data .
+[2025-04-19 12:07:32,050]   49  root - INFO  data ingestion part completed:
+[2025-04-19 12:07:32,069]   16  root - INFO  Data ingested:::::::
+[2025-04-19 12:07:32,070]   18  root - INFO  Data transformatin is started::::::
+[2025-04-19 12:07:32,893]   75  root - INFO  reading training and testing data.
+[2025-04-19 12:07:32,943]   76  root - INFO  train DataFrame Head : 
+   Unnamed: 0      id  carat      cut color clarity  depth  table     x     y     z  price
+0       24502   24502   1.19  Premium     H     SI2   62.5   56.0  6.83  6.76  4.25   4478
+1      151635  151635   1.21    Ideal     I     SI2   62.6   56.4  6.78  6.83  4.27   5258
+2       86713   86713   1.60    Ideal     F     SI1   61.1   57.0  7.59  7.62  4.64  12871
+3      152585  152585   0.33  Premium     G    VVS2   61.5   58.0  4.46  4.49  2.75    965
+4      118449  118449   0.30    Ideal     H     VS2   62.5   58.0  4.27  4.30  2.68    491
+[2025-04-19 12:07:32,988]   77  root - INFO  test DataFrame Head : 
+   Unnamed: 0      id  carat      cut color clarity  depth  table     x     y     z  price
+0       91385   91385   1.07  Premium     D     VS2   61.1   58.0  6.64  6.61  4.06   7479
+1      157802  157802   0.31    Ideal     G    VVS1   62.1   56.0  4.36  4.39  2.71    789
+2      155256  155256   0.93    Ideal     F     SI2   62.8   54.0  6.32  6.28  3.96   4054
+3      126649  126649   0.59    Ideal     I     SI1   62.9   57.0  5.32  5.38  3.37    909
+4       12234   12234   0.73    Ideal     E     VS2   61.2   57.0  5.79  5.82  3.55   3077
+[2025-04-19 12:07:32,988]   32  root - INFO  Data Transformation started
+[2025-04-19 12:07:33,012]   59  root - INFO  Data Transformation object is returned
+[2025-04-19 12:07:33,986]   93  root - INFO  Applying preprocessing object on training and testing datasets 
+
+[2025-04-19 12:07:34,537]   108  root - INFO  preprocessor object pickle file is saved 
+
+[2025-04-19 12:07:34,537]   109  root - INFO  Data preprocessing step is completed 
+
+[2025-04-19 12:07:34,560]   21  root - INFO  Data has Transformed
+[2025-04-19 12:07:34,560]   23  root - INFO  Model Trainer is started::::::
+[2025-04-19 12:07:36,749]   36  root - INFO  Splitting Dependent and independent variable
+[2025-04-19 12:07:36,800]   38  root - INFO  X_train shape  : (145179, 10) 
+            0         1         2         3         4         5         6    7    8    9
+0 -1.294687  0.861787  0.628371 -0.638766  1.003398  0.941926  1.042418  3.0  4.0  1.0
+1  0.982552  0.904998  0.720806 -0.430329  0.958347  1.005399  1.071567  4.0  5.0  1.0
+
+[2025-04-19 12:07:36,806]   41  root - INFO  Y_train shape  : (145179, 1) 
+          0
+0  4478.0
+1  5258.0
+
+[2025-04-19 12:07:36,853]   44  root - INFO  X_test shape  : (48394, 10) 
+            0         1         2         3         4         5         6    7    8    9
+0 -0.096662  0.602519 -0.665727  0.403418  0.832207  0.805912  0.765505  3.0  0.0  3.0
+1  1.093017 -1.039510  0.258628 -0.638766 -1.222085 -1.207087 -1.202034  4.0  3.0  6.0
+
+[2025-04-19 12:07:36,865]   47  root - INFO  Y_test shape  : (48394, 1) 
+          0
+0  7479.0
+1   789.0
+
+[2025-04-19 12:07:36,866]   56  root - INFO  model evaluation :
+[2025-04-19 12:08:17,153]   60  root - INFO  Best model is ::: (Lasso(), 0.9361157588573099) 
+
+[2025-04-19 12:08:17,153]   62  root - INFO  Model is Training is completed
+[2025-04-19 12:08:17,153]   63  root - INFO  Model path is logged to mlflow
+[2025-04-19 12:08:17,166]   26  root - INFO  Model has Trained Succesfully:::::::
+[2025-04-19 12:08:17,166]   28  root - INFO  Model evaluation:::::::::
+[2025-04-19 12:08:17,166]   21  root - INFO  evaluation started

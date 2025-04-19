@@ -2,6 +2,11 @@ import os
 import pandas as pd
 import mysql.connector
 
+"""
+   This code upload a DataFrame which is .csv format uplaod to MongoDB database 
+   using mysql.connector library
+"""
+
 df=pd.read_csv("C:\\Users\\HP\\Desktop\\tips.csv")
 
 import mysql.connector

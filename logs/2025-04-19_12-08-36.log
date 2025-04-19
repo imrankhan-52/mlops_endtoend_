@@ -1,0 +1,64 @@
+[2025-04-19 12:08:47,098]   12  root - INFO  Training Pipeline::::::::
+[2025-04-19 12:08:47,099]   13  root - INFO  Data ingestion is started::::::
+[2025-04-19 12:08:47,099]   27  root - INFO  data ingestion started:
+[2025-04-19 12:08:51,138]   34  root - INFO  reading data from dataframe
+[2025-04-19 12:08:55,947]   42  root - INFO  i am performing train test split
+[2025-04-19 12:08:56,057]   45  root - INFO  saving train and test data .
+[2025-04-19 12:09:00,519]   49  root - INFO  data ingestion part completed:
+[2025-04-19 12:09:00,537]   16  root - INFO  Data ingested:::::::
+[2025-04-19 12:09:00,537]   18  root - INFO  Data transformatin is started::::::
+[2025-04-19 12:09:01,269]   75  root - INFO  reading training and testing data.
+[2025-04-19 12:09:01,316]   76  root - INFO  train DataFrame Head : 
+   Unnamed: 0      id  carat      cut color clarity  depth  table     x     y     z  price
+0      106419  106419   1.02    Ideal     F     SI2   62.1   56.0  6.41  6.44  4.00   4235
+1        5117    5117   0.58  Premium     F     VS1   61.8   56.0  5.39  5.35  3.32   2289
+2      110940  110940   1.53  Premium     G     VS2   61.5   60.0  7.40  7.38  4.54  12787
+3      124702  124702   1.01    Ideal     H     SI1   60.0   55.0  6.56  6.59  3.94   5458
+4        4166    4166   1.05    Ideal     G     SI1   62.4   57.0  6.54  6.48  4.06   4900
+[2025-04-19 12:09:01,358]   77  root - INFO  test DataFrame Head : 
+   Unnamed: 0      id  carat        cut color clarity  depth  table     x     y     z  price
+0         643     643   0.41      Ideal     G     SI1   61.5   53.0  4.80  4.82  2.96    754
+1      175561  175561   0.51  Very Good     E     SI1   62.0   56.0  5.15  5.19  3.20   1371
+2       92561   92561   1.21  Very Good     J    VVS2   63.1   59.0  6.66  6.70  4.21   7098
+3      153113  153113   1.01  Very Good     H     SI2   61.6   58.0  6.42  6.47  3.97   3692
+4       85722   85722   1.03    Premium     G     VS1   60.1   58.0  6.55  6.51  3.91   6190
+[2025-04-19 12:09:01,358]   32  root - INFO  Data Transformation started
+[2025-04-19 12:09:01,382]   59  root - INFO  Data Transformation object is returned
+[2025-04-19 12:09:02,137]   93  root - INFO  Applying preprocessing object on training and testing datasets 
+
+[2025-04-19 12:09:02,394]   108  root - INFO  preprocessor object pickle file is saved 
+
+[2025-04-19 12:09:02,394]   109  root - INFO  Data preprocessing step is completed 
+
+[2025-04-19 12:09:02,423]   21  root - INFO  Data has Transformed
+[2025-04-19 12:09:02,423]   23  root - INFO  Model Trainer is started::::::
+[2025-04-19 12:09:04,974]   36  root - INFO  Splitting Dependent and independent variable
+[2025-04-19 12:09:05,020]   38  root - INFO  X_train shape  : (145179, 10) 
+            0         1         2         3         4         5         6    7    8    9
+0  0.173945  0.493125  0.256188 -0.639082  0.624255  0.651120  0.672832  4.0  2.0  1.0
+1 -1.639220 -0.456707 -0.021310 -0.639082 -0.294782 -0.337363 -0.312368  3.0  2.0  4.0
+
+[2025-04-19 12:09:05,031]   41  root - INFO  Y_train shape  : (145179, 1) 
+          0
+0  4235.0
+1  2289.0
+
+[2025-04-19 12:09:05,065]   44  root - INFO  X_test shape  : (48394, 10) 
+            0         1         2         3         4         5         6    7    8    9
+0 -1.719299 -0.823687 -0.298808 -2.200459 -0.826382 -0.818002 -0.833945  4.0  3.0  2.0
+1  1.411491 -0.607817  0.163688 -0.639082 -0.511026 -0.482462 -0.486227  2.0  1.0  2.0
+
+[2025-04-19 12:09:05,087]   47  root - INFO  Y_test shape  : (48394, 1) 
+          0
+0   754.0
+1  1371.0
+
+[2025-04-19 12:09:05,087]   56  root - INFO  model evaluation :
+[2025-04-19 12:09:57,667]   60  root - INFO  Best model is ::: (LinearRegression(), 0.9384299081019123) 
+
+[2025-04-19 12:09:57,668]   62  root - INFO  Model is Training is completed
+[2025-04-19 12:09:57,668]   63  root - INFO  Model path is logged to mlflow
+[2025-04-19 12:09:57,713]   26  root - INFO  Model has Trained Succesfully:::::::
+[2025-04-19 12:09:57,713]   28  root - INFO  Model evaluation:::::::::
+[2025-04-19 12:09:57,713]   21  root - INFO  evaluation started
+[2025-04-19 12:10:11,101]   31  root - INFO  Model Evaluation completed:::::::::

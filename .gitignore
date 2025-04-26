@@ -3,3 +3,4 @@ myenv
 experiments
 mlruns
 mlartifacts
+logs

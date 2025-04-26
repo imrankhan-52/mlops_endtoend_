@@ -4,7 +4,7 @@ scikit-learn
 seaborn 
 pymongo[srv]
 mlflow
-dvc
+dvc==3.16.9
 flask
 
 -e .

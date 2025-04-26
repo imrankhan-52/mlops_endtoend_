@@ -1,13 +1,14 @@
 import os
 import sys
 import pickle
+import yaml
 import numpy as np
 import pandas as pd
 
 from src.logger.logger import logging
 from src.exception.exception import CustomException
 
-from sklearn.metrics import r2_score,mean_absolute_error,mean_squared_error
+
 
 def save_object(filepath,obj):
     try:
@@ -58,3 +59,39 @@ def save_numpy_array_data(file_path: str, array: np.array):
             np.save(file_obj, array)
     except Exception as e:
         raise CustomException(e, sys) from e
+    
+def load_numpy_array_data(file_path: str) -> np.array:
+    """
+    load numpy array data from file
+    file_path: str location of file to load
+    return: np.array data loaded
+    """
+    try:
+        with open(file_path, 'rb') as file_obj:
+            return np.load(file_obj)
+    except Exception as e:
+        raise CustomException(e, sys) from e
+
+
+
+
+def read_yaml_file(file_path: str) -> dict:
+    try:
+        with open(file_path, "rb") as yaml_file:
+            return yaml.safe_load(yaml_file)
+
+    except Exception as e:
+        raise CustomException(e, sys) from e
+
+
+def write_yaml_file(file_path: str, content: object, replace: bool = False) -> None:
+    try:
+        if replace:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "w") as file:
+            yaml.dump(content, file)
+    except Exception as e:
+        raise CustomException(e,sys)
+    

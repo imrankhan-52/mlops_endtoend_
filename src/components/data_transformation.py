@@ -10,6 +10,10 @@ from src.logger.logger import logging
 from src.exception.exception import CustomException
 from src.utils.utils import save_object,save_numpy_array_data
 from src.components.data_ingestion import DataIngestion
+from src.components.data_validation import DataValidation
+
+from src.entity.artifacts_entity import DataIngestionArtifacts,DataValidationArtifact,DataTransformationArtifacts
+from src.entity.config_entity import DataTransformationConfig
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -17,15 +21,15 @@ from sklearn.preprocessing import OneHotEncoder,OrdinalEncoder,StandardScaler
 from sklearn.impute import SimpleImputer
 
 
-@dataclass
-class DataTransformationConfig:
-    preprocessor_obj_file_path=os.path.join("data","processed","preprocessor.pkl")
-    train_arr_path=os.path.join("data","process","train_arr.np")
-    test_arr_path=os.path.join("data","process","test_arr.np")
+
    
 class DataTransformation:
-    def __init__(self):
+    def __init__(self,data_ingestion_artifacts:DataIngestionArtifacts,
+                 data_validation_artifacts:DataValidationArtifact):
+
         self.data_transformation_config=DataTransformationConfig()
+        self.data_ingestion_artifacts=data_ingestion_artifacts
+        self.data_validation_artifacts=data_validation_artifacts
 
     def data_transformation(self,gms):
         try:
@@ -37,7 +41,7 @@ class DataTransformation:
             cat_col=gms.select_dtypes(include='object').columns
             num_col=gms.select_dtypes(exclude='object').columns
 
-            num_col=num_col.drop(['id','price'])
+            num_col=num_col.drop(['price'])
 
             num_pipeline=Pipeline(steps=[
                 ('impute',SimpleImputer()),
@@ -62,24 +66,25 @@ class DataTransformation:
             logging.info("data")
             raise CustomException(e,sys)
 
-    def initiate_data_transformation(self,train_path,test_path):
+    def initiate_data_transformation(self)->DataTransformationArtifacts:
+        """
+        Initiating Data Transformation Artifacts 
+        """
         try:
             mlflow.set_experiment("GemStone_ML_Pipeline")
             with mlflow.start_run(run_name="data_transformation",nested=True):
-                train=pd.read_csv(train_path)
-                test=pd.read_csv(test_path)
+                if not self.data_validation_artifacts.validation_status:
+                    raise Exception(self.data_validation_artifacts.message)
+                train=pd.read_csv(self.data_ingestion_artifacts.train_data_path)
+                test=pd.read_csv(self.data_ingestion_artifacts.test_data_path)
 
-                mlflow.log_param("train_rows", train.shape[0])
-                mlflow.log_param("test_rows", test.shape[0])
-
-                logging.info("reading training and testing data.")
                 logging.info(f"train DataFrame Head : \n{train.head()}")
                 logging.info(f"test DataFrame Head : \n{test.head()}")
                 
                 preprocessor_obj=self.data_transformation(train)
 
                 target_column='price'
-                drop_column=[target_column,'id']
+                drop_column=[target_column]
 
                 train_df = train.drop(drop_column,axis=1)
                 target_train=train[target_column]
@@ -87,19 +92,20 @@ class DataTransformation:
                 test_df = test.drop(drop_column,axis=1)
                 target_test=test[target_column]
 
-                train_df_transform=preprocessor_obj.fit_transform(train_df)
-                test_df_transform=preprocessor_obj.transform(test_df)
-
                 logging.info("Applying preprocessing object on training and testing datasets \n")
 
-                train_arr=np.c_[train_df_transform,np.array(target_train)]
-                test_arr=np.c_[test_df_transform,np.array(target_test)]
+                train_arr=preprocessor_obj.fit_transform(train_df)
+                test_arr=preprocessor_obj.transform(test_df)
+
+
+                train_arr=np.c_[train_arr,np.array(target_train)]
+                test_arr=np.c_[test_arr,np.array(target_test)]
 
                 save_numpy_array_data(self.data_transformation_config.train_arr_path,train_arr)
                 save_numpy_array_data(self.data_transformation_config.test_arr_path,test_arr)
 
 
-                mlflow.log_artifact(self.data_transformation_config.preprocessor_obj_file_path)
+                #mlflow.log_artifact(self.data_transformation_config.preprocessor_obj_file_path)
 
                 mlflow.log_param("transformed_train_shape", train_arr.shape)
                 mlflow.log_param("transformed_test_shape", test_arr.shape)
@@ -107,11 +113,14 @@ class DataTransformation:
                 save_object(self.data_transformation_config.preprocessor_obj_file_path,preprocessor_obj)
                 logging.info("preprocessor object pickle file is saved \n")
                 logging.info("Data preprocessing step is completed \n")
-                return (train_arr,test_arr)
-
-            
-
+                return DataTransformationArtifacts(
+                    preprocessor_obj_file_path=self.data_transformation_config.preprocessor_obj_file_path,
+                    train_arr_path=self.data_transformation_config.train_arr_path,
+                    test_arr_path=self.data_transformation_config.test_arr_path
+                    )            
         except Exception as e:
             raise CustomException(e,sys)
         
 
+if __name__=="__main__":
+    pass

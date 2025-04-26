@@ -1,0 +1,30 @@
+columns:         
+  - carat      
+  - cut        
+  - color      
+  - clarity   
+  - depth      
+  - table      
+  - x          
+  - y          
+  - z          
+  - price 
+
+
+numerical_col:
+  - carat 
+  - depth 
+  - table 
+  - x 
+  - y
+  - z 
+  - price
+
+
+categorical_col:
+  - cut
+  - color
+  - clarity
+
+drop_col: id
+

@@ -4,6 +4,8 @@ import pandas as pd
 
 from src.logger.logger import logging
 from src.exception.exception import CustomException
+
+from src.entity.artifacts_entity import DataTransformationArtifacts,TrainerModelArtifacts
 from src.utils.utils import load_object
 
 

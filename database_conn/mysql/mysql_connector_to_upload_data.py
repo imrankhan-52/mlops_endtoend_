@@ -25,7 +25,7 @@ cursor = cnx.cursor()
 
 
 create_table_query = """
-    CREATE TABLE IF NOT EXISTS tips (
+    CREATE TABLE IF NOT EXISTS gemstone (
     id INT AUTO_INCREMENT PRIMARY KEY,
     total_bill FLOAT,
     tip FLOAT,

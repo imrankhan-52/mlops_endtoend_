@@ -1,5 +1,7 @@
 import os
 import sys
+from cloudpickle import load
+from typing import Tuple
 import mlflow
 import mlflow.artifacts
 from mlflow.sklearn import autolog
@@ -10,63 +12,106 @@ import pandas as pd
 from dataclasses import dataclass
 from pathlib import Path
 
+from src.entity.artifacts_entity import (DataTransformationArtifacts,
+                                        TrainerModelArtifacts,
+                                        RegressionMetricArtifact)
+from src.entity.config_entity import TrainerModelConfig
 from src.logger.logger import logging
 from src.exception.exception import CustomException
-from src.utils.utils import save_object,evaluat_model
+
 from sklearn.linear_model import LinearRegression,Lasso
+from src.utils.utils import load_object,load_numpy_array_data,save_object
+from sklearn.metrics import r2_score,mean_absolute_error,mean_squared_error
 
 from src.components.data_ingestion import DataIngestion
+from src.components.data_validation import DataValidation
 from src.components.data_transformation import DataTransformation
 
 
-@dataclass
-class ModelTrainerConfig:
-    trained_model_path=os.path.join("model","model.pkl")
-    
-
 class ModelTrainer:
-    def __init__(self):
-        self.model_trainer_config=ModelTrainerConfig()
+    def __init__(self,data_transformation_artifacts:DataTransformationArtifacts):
 
-    def initiate_model_training(self,train_arr,test_arr):
+        self.model_trainer_config=TrainerModelConfig()
+        self.data_transformation_artifacts=data_transformation_artifacts
+
+    def get_model_object_and_report(self, train: np.array, test: np.array) -> Tuple[object, object]:
+        """
+        Method Name :   get_model_object_and_report
+        Description :   This function trains a RandomForestClassifier with specified parameters
+        
+        Output      :   Returns metric artifact object and trained model object
+        On Failure  :   Write an exception log and then raise an exception
+        """
+        try:
+            logging.info("Training LassoRegression with specified parameters")
+
+            # Splitting the train and test data into features and target variables
+            x_train, y_train, x_test, y_test = train[:, :-1], train[:, -1], test[:, :-1], test[:, -1]
+            logging.info("train-test split done.")
+
+            model=Lasso(alpha=0.1, max_iter=100, random_state=42)
+
+            # Fit the model
+            logging.info("Model training going on...")
+            model.fit(x_train, y_train)
+            logging.info("Model training done.")
+
+            # Predictions and evaluation metrics
+            y_pred = model.predict(x_test)
+            accuracy = r2_score(y_test, y_pred)
+            mae=mean_absolute_error(y_test, y_pred)
+            mse = mean_squared_error(y_test, y_pred)
+            #rmse=np.sqrt(mean_squared_error((y_test, y_pred)))
+            metric_artifact=RegressionMetricArtifact(r2_score=accuracy,mae=mae,mse=mse)
+
+            return model, metric_artifact
+        
+        except Exception as e:
+            raise CustomException(e, sys) from e
+
+
+
+    def initiate_model_training(self):
+        """
+        Method Name :   initiate_model_trainer
+        Description :   This function initiates the model training steps
+        
+        Output      :   Returns model trainer artifact
+        On Failure  :   Write an exception log and then raise an exception
+        """
         try:
             mlflow.set_experiment("GemStone_ML_Pipeline")
             autolog()
             with mlflow.start_run(run_name="model_trainer"):
-                logging.info("Splitting Dependent and independent variable")
-                X_train=train_arr[:,:-1]
-                logging.info(f"X_train shape  : {pd.DataFrame(X_train).shape} \n  {pd.DataFrame(X_train).head(2)}\n")
-                
-                Y_train=train_arr[:,-1]
-                logging.info(f"Y_train shape  : {pd.DataFrame(Y_train).shape} \n  {pd.DataFrame(Y_train).head(2)}\n")
-                
-                X_test=test_arr[:,:-1]
-                logging.info(f"X_test shape  : {pd.DataFrame(X_test).shape} \n  {pd.DataFrame(X_test).head(2)}\n")
-                
-                Y_test=test_arr[:,-1]
-                logging.info(f"Y_test shape  : {pd.DataFrame(Y_test).shape} \n  {pd.DataFrame(Y_test).head(2)}\n")
+                logging.info("Model training starting:")
+                train_arr=load_numpy_array_data(self.data_transformation_artifacts.train_arr_path)
+                test_arr=load_numpy_array_data(self.data_transformation_artifacts.test_arr_path)
+                logging.info(f"train_arr shape  : {pd.DataFrame(train_arr).shape} \n  {pd.DataFrame(train_arr).head(2)}\n")
 
-                dict1={
-                'LinearRegression':LinearRegression(),
-                'Lasso':Lasso(),
-                #'RandomForestRegressor':RandomForestRegressor(),
-                #'GradientBoostingRegressor':GradientBoostingRegressor()
-                }
+                trained_model, metric_artifact = self.get_model_object_and_report(train=train_arr, test=test_arr)
+                logging.info(f"model metrics {metric_artifact}")
+                logging.info("Model object and artifact loaded.")
+                save_object(self.model_trainer_config.trained_model_path,trained_model)
 
-                logging.info("model evaluation :")
-                
-                best_model=evaluat_model(X_train,Y_train,X_test,Y_test,dict1)
+                # Load preprocessing object
+                preprocessing_obj = load_object(file_path=self.data_transformation_artifacts.preprocessor_obj_file_path)
+                logging.info("Preprocessing obj loaded.")
 
-                logging.info(f"Best model is ::: {best_model} \n")
-                model_obj=best_model[0]
-                logging.info(f"Model is Training is completed")
-                logging.info(f"Model path is logged to mlflow")
-                mlflow.log_artifact(self.model_trainer_config.trained_model_path)
-                save_object(self.model_trainer_config.trained_model_path,model_obj)
+                if r2_score(train_arr[:, -1], trained_model.predict(train_arr[:, :-1])) < 0.80:
+                    logging.info("No model found with score above the base score")
+                    raise Exception("No model found with score above the base score")
 
+                model_trainer_artifact = TrainerModelArtifacts(
+                trained_model_file_path=self.model_trainer_config.trained_model_path,
+                metric_artifact=metric_artifact,
+                )
+                logging.info("Model Training completed:")
+                return model_trainer_artifact
 
         except Exception as e:
             logging.info("model trainer components error")
             raise CustomException(e,sys)
         
 
+if __name__=="__main__":
+    pass

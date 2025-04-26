@@ -1,6 +1,1 @@
-- 1 - make project template
-- 2 - install - r requirements.txt file.
-- 3 - notebook experiments
-- 5 - write logger file and exception file.
-- 6 - start with data ingestion components.
-- 7 - update utils file . 
+##

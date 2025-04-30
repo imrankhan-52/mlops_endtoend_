@@ -23,9 +23,3 @@ jobs:
             pip install -r requirements_dev.txt
         - name: Run python file
           run:  python run_pipeline.py
-
-        - name: Create CML Report
-          env:
-            REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-          run: |
-            cml comment create reports.md

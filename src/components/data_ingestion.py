@@ -39,7 +39,8 @@ class DataIngestion:
             dir_path = os.path.dirname(raw_data_path)
             os.makedirs(dir_path,exist_ok=True)
             logging.info(f"Saving exported data into feature store file path: {raw_data_path}")
-            dataframe= pd.read_csv("data\gemstone.csv")
+            path=Path("data/gemstone.csv")
+            dataframe= pd.read_csv(path)
             dataframe.drop('id',inplace=True,axis=1)
             dataframe.to_csv(raw_data_path,header=True,index=False)
             return dataframe
